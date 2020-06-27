@@ -11,6 +11,9 @@ use vst::event::MidiEvent;
 use vst::plugin::{CanDo, HostCallback, Info, Plugin, PluginParameters};
 use vst::util::AtomicFloat;
 
+use reaper_low::{ReaperPluginContext};
+use reaper_medium::{Reaper, ReaperFunctions, RealTimeAudioThreadScope};
+
 plugin_main!(CCControl); // Important!
 
 static NUM_CCS: i32 = 32;
@@ -24,6 +27,21 @@ struct CCControl {
 
 impl CCControl {
     fn send_midi(&mut self) {
+        let mut reaper: ReaperFunctions<RealTimeAudioThreadScope>;
+        if let Ok(context) = ReaperPluginContext::from_vst_plugin(self.host) {
+            let session = Reaper::load(&context);
+            reaper = session.create_real_time_functions();
+        }
+
+j       let mut stack = self.params.update_stack.write().unwrap();
+
+        for cc in 0..NUM_CCS {
+            for channel in 0..16 {
+                let i: usize = (16 * cc + channel).try_into().unwrap();
+                stack.push(i)
+            }
+        }
+
         let mut stack = self.params.update_stack.write().unwrap();
         let mut index = stack.pop();
         let mut new_cc_events: Vec<MidiEvent> = Vec::new();
@@ -55,21 +73,22 @@ impl CCControl {
         self.send_buffer.send_events(new_cc_events, &mut self.host);
     }
 }
+
 impl Plugin for CCControl {
     fn new(host: HostCallback) -> Self {
         let mut p = CCControl::default();
+
+
         p.host = host;
         p
     }
 
+    fn init(&mut self) {
+        let reaper = self.get_reaper_api().unwrap();
+        reaper.show_console_msg("Hello world!");
+    }
+
     fn start_process(&mut self) {
-        let mut stack = self.params.update_stack.write().unwrap();
-        for cc in 0..NUM_CCS {
-            for channel in 0..16 {
-                let i: usize = (16 * cc + channel).try_into().unwrap();
-                stack.push(i)
-            }
-        }
     }
 
     fn get_info(&self) -> Info {
