@@ -40,6 +40,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7bbb73db36c1246e9034e307d0fba23f9a2e251faa47ade70c1bd252220c8311"
 
 [[package]]
+name = "cc_control"
+version = "0.1.0"
+dependencies = [
+ "arr_macro",
+ "midi-consts",
+ "time",
+ "vst",
+]
+
+[[package]]
 name = "cfg-if"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -71,13 +81,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "midi_control"
+name = "midi-consts"
 version = "0.1.0"
-dependencies = [
- "arr_macro",
- "time",
- "vst",
-]
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6f2dd5c7f8aaf48a76e389068ab25ed80bdbc226b887f9013844c415698c9952"
 
 [[package]]
 name = "num-traits"
