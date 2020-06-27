@@ -62,6 +62,16 @@ impl Plugin for CCControl {
         p
     }
 
+    fn resume(&mut self) {
+        let mut stack = self.params.update_stack.write().unwrap();
+        for cc in 0..NUM_CCS {
+            for channel in 0..16 {
+                let i: usize = (16 * cc + channel).try_into().unwrap();
+                stack.push(i)
+            }
+        }
+    }
+
     fn start_process(&mut self) {
         let mut stack = self.params.update_stack.write().unwrap();
         for cc in 0..NUM_CCS {
